@@ -48,7 +48,7 @@ header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background-color: #fcfa;
+  background-color: rgba(255, 204, 255, 0.932);
 }
 
 nav {
@@ -102,6 +102,7 @@ main {
   justify-content: start;
   padding: 8px 8px 4px;
   align-items: center;
+  gap: 10px;
 }
 
 .fs-main li * {

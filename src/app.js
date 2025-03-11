@@ -6,7 +6,7 @@ const app = express();
 const port = 3000;
 
 // Function to convert permission string to an integer
-const permissionsToInteger = (permissionString) => {
+const permissionsToIntStr = (permissionString) => {
   let result = 0;
 
   const permissionValues = {
@@ -27,10 +27,9 @@ const permissionsToInteger = (permissionString) => {
     // Add the chunk value to the result
     result = result * 10 + chunkValue;
   }
-  return result;
+  return result.toString();
 };
 
-// Function to analyze each entry from the ls output
 const analyzeEntry = (entryLine, pathString) => {
   const permissionString = entryLine[0];
 
@@ -41,51 +40,70 @@ const analyzeEntry = (entryLine, pathString) => {
       ? "dir"
       : "file";
 
-  const permission = permissionsToInteger(permissionString) + "";
+  const size = entryLine[4];
+  const permission = permissionsToIntStr(permissionString);
   const name = entryLine.slice(8).join(" ");
-  const path = pathString.endsWith("/") ? pathString + name : pathString + "/" + name; // Ensure single slash
-
-  // Format symbolic link names for better readability
-  const formattedName = type === "link" ? name.replace(/ -\u003E /g, " -> ") : name;
+  const path =
+    type === "link"
+      ? `${pathString.endsWith("/") ? pathString : pathString + "/"}${
+          name.split(" -\u003E ")[0]
+        }`
+      : `${
+          pathString.endsWith("/") ? pathString + name : pathString + "/" + name
+        }`;
 
   return {
-    name: formattedName,
+    name,
     path,
     type,
     permission,
+    size,
   };
 };
 
-// Serve static files from the "public" directory
+const splitEntries = (stdout, requestedPath) => {
+  return stdout
+    .split("\n")
+    .filter((line) => line)
+    .slice(1)
+    .map((line) => {
+      const parts = line.split(/\s+/);
+      return analyzeEntry(parts, requestedPath);
+    });
+};
+
+const run_ls = (requestedPath) => {
+  return new Promise((resolve, reject) => {
+    exec(`ls -lh ${requestedPath}`, (error, stdout, stderr) => {
+      if (error) {
+        return reject(new Error(error.message));
+      }
+      if (stderr) {
+        return reject(new Error(stderr));
+      }
+      const entries = splitEntries(stdout, requestedPath);
+      resolve(entries);
+    });
+  });
+};
+
+app.use(express.json({ limit: "100mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
-// Endpoint to list directory contents
-app.get("/ls", (req, res) => {
-  // Ensure requestedPath is defined correctly
-  const requestedPath = (req.query.path === "/" || req.query.path === "") ? "/" : (req.query.path || "/");
+app.get("/ls", async (req, res) => {
+  const requestedPath =
+    req.query.path === "/" || req.query.path === ""
+      ? "/"
+      : req.query.path || "/";
 
-  exec(`ls -lh ${requestedPath}`, (error, stdout, stderr) => {
-    if (error) {
-      return res.status(500).json({ error: `Error: ${error.message}` });
-    }
-    if (stderr) {
-      return res.status(500).json({ error: `stderr: ${stderr}` });
-    }
-
-    const entries = stdout
-      .split("\n")
-      .filter((line) => line)
-      .slice(1) // Skip the first entry
-      .map((line) => {
-        const parts = line.split(/\s+/);
-        return analyzeEntry(parts, requestedPath); // Pass the requestedPath directly
-      });
-
-    res.json(entries); // Send the structured entries as JSON
-  });
+  try {
+    const result = await run_ls(requestedPath);
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ error: `Error: ${error.message}` });
+  }
 });
 
-// Start the server
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
 });
