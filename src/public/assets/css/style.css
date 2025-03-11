@@ -1,0 +1,161 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+input,
+button,
+select,
+textarea,
+a {
+  font-family: inherit;
+}
+
+a {
+  color: currentColor;
+  text-decoration: none;
+}
+
+ul {
+  list-style: none;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  background-color: transparent;
+}
+
+html {
+  font-family: monospace, sans-serif;
+  scroll-behavior: smooth;
+}
+
+body {
+  position: relative;
+  min-height: 100vh;
+  background-color: #69aa;
+}
+
+.container {
+  width: calc(100% - 80px);
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: #fcfa;
+}
+
+nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+}
+
+nav h1 {
+  font-size: 32px;
+  font-weight: 500;
+  color: rgb(255, 28, 111);
+}
+
+nav ul {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 28px;
+  font-weight: 500;
+  color: rgb(156, 69, 69);
+}
+
+.nav-btn {
+  font-size: 28px;
+  font-weight: 600;
+  color: #000;
+  transition: color 100ms linear;
+}
+
+.nav-btn:hover {
+  color: #00f;
+}
+
+main {
+  padding: 40px 0 80px;
+}
+
+.fs-header {
+  display: grid;
+  grid-template-columns: 2.5fr 0.8fr repeat(2, 1fr) 120px;
+  justify-content: start;
+  padding: 8px;
+  font-size: 20px;
+}
+
+.fs-main li {
+  display: grid;
+  grid-template-columns: 2.5fr 0.8fr repeat(2, 1fr) 120px;
+  justify-content: start;
+  padding: 8px 8px 4px;
+  align-items: center;
+}
+
+.fs-main li * {
+  font-size: 20px;
+}
+
+.fs-main li button {
+  transition: color 100ms linear;
+  font-weight: 700;
+}
+
+.fs-main li button:hover {
+  color: rgb(0, 123, 255);
+}
+
+.fs-main li .actions-container {
+  display: flex;
+  gap: 8px;
+}
+
+.fs-main li .actions-container select {
+  border-radius: 8px 8px 0 0;
+  text-align: center;
+  border-bottom: 2px solid #000;
+  outline: none;
+  cursor: pointer;
+  background-color: #e7e7e7;
+}
+
+.fs-main li .actions-container button {
+  background-color: rgb(112, 71, 153);
+  padding: 8px;
+  border-radius: 4px;
+  color: #fff;
+  transition: color 100ms linear, scale 100ms linear;
+}
+
+.fs-main li .actions-container button:hover {
+  color: rgb(245, 173, 255);
+}
+
+.fs-main li .actions-container button:active {
+  scale: 0.97;
+}
+
+.fs-id {
+  display: flex;
+  align-items: center;
+  justify-content: start;
+  gap: 8px;
+}
+
+.fs-id img {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+}

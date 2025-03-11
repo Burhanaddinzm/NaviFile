@@ -1,0 +1,4 @@
+Should have a simple web based interface
+Run locally for now
+Start at root directory
+Utilize bash for getting directory and file info (ls,cd,cat)
