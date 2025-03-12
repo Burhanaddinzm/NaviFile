@@ -3,7 +3,30 @@ const path = require("path");
 const { exec } = require("child_process");
 
 const app = express();
-const port = 3000;
+const port = 49154;
+
+const convertToDateTime = (str) => {
+  const parts = str.split(" ");
+
+  const currentYear = new Date().getFullYear();
+  let day, month, year, time;
+
+  if (parts[parts.length - 1].includes(":")) {
+    day = parts[0];
+    month = parts[1];
+    time = parts[2];
+    year = currentYear;
+  } else {
+    day = parts[0];
+    month = parts[1];
+    year = parts[2];
+    time = "00:00"; // Default time
+  }
+
+  const dateString = `${day} ${month} ${year} ${time}`;
+  const dateJsFormat = new Date(dateString);
+  return { dateString, dateJsFormat };
+};
 
 // Function to convert permission string to an integer
 const permissionsToIntStr = (permissionString) => {
@@ -40,10 +63,15 @@ const analyzeEntry = (entryLine, pathString) => {
       ? "dir"
       : "file";
 
+  const { dateString } = convertToDateTime(
+    `${entryLine[6]} ${entryLine[5]} ${entryLine[7]}`
+  );
+
   const size = entryLine[4];
   const permission = permissionsToIntStr(permissionString);
   const name = entryLine.slice(8).join(" ");
-  const path =
+  // normalizing path to make sure it appears correctly
+  const fullPath =
     type === "link"
       ? `${pathString.endsWith("/") ? pathString : pathString + "/"}${
           name.split(" -\u003E ")[0]
@@ -54,20 +82,23 @@ const analyzeEntry = (entryLine, pathString) => {
 
   return {
     name,
-    path,
+    fullPath,
+    path: pathString,
     type,
     permission,
     size,
+    date: dateString,
   };
 };
 
 const splitEntries = (stdout, requestedPath) => {
   return stdout
-    .split("\n")
-    .filter((line) => line)
-    .slice(1)
+    .split("\n") // 1. Split the output by newlines
+    .filter((line) => line) // 2. Remove any empty lines
+    .slice(1) // 3. Remove the first line (index 0)
     .map((line) => {
-      const parts = line.split(/\s+/);
+      // 4. Process each remaining line
+      const parts = line.split(/\s+/); // 5. Split the line by one or more spaces (whitespace)
       return analyzeEntry(parts, requestedPath);
     });
 };
@@ -91,6 +122,7 @@ app.use(express.json({ limit: "100mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/ls", async (req, res) => {
+  // making sure there is a default request path is set, if not get root dir
   const requestedPath =
     req.query.path === "/" || req.query.path === ""
       ? "/"
@@ -98,7 +130,7 @@ app.get("/ls", async (req, res) => {
 
   try {
     const result = await run_ls(requestedPath);
-    res.json(result);
+    res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: `Error: ${error.message}` });
   }

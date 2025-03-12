@@ -93,7 +93,12 @@ main {
   grid-template-columns: 2.5fr 0.8fr repeat(2, 1fr) 120px;
   justify-content: start;
   padding: 8px;
+  margin: 0 0 0 -24px;
   font-size: 20px;
+}
+
+.fs-header h2:first-child {
+  margin: 0 0 0 24px;
 }
 
 .fs-main li {

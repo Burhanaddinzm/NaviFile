@@ -1,12 +1,12 @@
 "use strict";
 
-const rootEl = document.querySelector("nav ul li:first-child");
 const fsMainEl = document.querySelector(".fs-main");
+const navUlEl = document.querySelector("header nav ul");
 
 const fetchLS = async (requestPath) => {
   try {
     const response = await fetch(
-      `http://localhost:3000/ls?path=${requestPath}`
+      `http://localhost:49154/ls?path=${requestPath}`
     );
     const data = await response.json();
 
@@ -16,12 +16,42 @@ const fetchLS = async (requestPath) => {
   }
 };
 
-const populateFsMain = (data) => {
+const createRootEl = async () => {
+  const rootEl = document.createElement("li");
+  const button = document.createElement("button");
+  button.dataset.path = "/";
+  button.classList.add("nav-btn");
+  button.textContent = "/ (root)";
+
+  rootEl.appendChild(button);
+  navUlEl.appendChild(rootEl);
+};
+
+const populateNav = async (path) => {
+  navUlEl.innerHTML = "";
+  await createRootEl();
+
+  const pathParts = path.split("/").filter((part) => part);
+  let currentPath = "";
+
+  for (const part of pathParts) {
+    currentPath += `/${part}`;
+    navUlEl.innerHTML += `&gt; <li><button class="nav-btn" data-path="${currentPath}/">${part}/</button></li>`;
+  }
+
+  const btns = navUlEl.querySelectorAll(".nav-btn");
+  for (const button of btns) {
+    const path = button.dataset.path;
+    button.addEventListener("click", async () => await loadDir(path));
+  }
+};
+
+const populateFsMain = async (data) => {
   fsMainEl.innerHTML = "";
   let htmlContent = "";
 
   for (const entry of data) {
-    const { name, path, permission, type, size } = entry;
+    const { name, fullPath, path, permission, type, size, date } = entry;
     const permArr = permission.split("");
     let addByte = false;
 
@@ -36,11 +66,11 @@ const populateFsMain = (data) => {
                 ? "./assets/images/folder.svg"
                 : "./assets/images/file.svg"
             }" alt="">
-            <button>${name}</button>
+            <button id="content-btn" data-path="${path}" data-full-path="${fullPath}" data-type="${type}">${name}</button>
           </div>
           <span>${size}${addByte ? "B" : ""}</span>
           <div>U:${permArr[0]} G:${permArr[1]} O:${permArr[2]}</div>
-          <span>03/10/2025 02:52 PM</span>
+          <span>${date}</span>
           <div class="actions-container">
             <select name="actions" id="">
               <option value="move">Move</option>
@@ -55,11 +85,26 @@ const populateFsMain = (data) => {
   }
 
   fsMainEl.innerHTML = htmlContent;
+  const btns = fsMainEl.querySelectorAll("#content-btn");
+  for (const btn of btns) {
+    const btnPath = btn.dataset.fullPath;
+    const btnType = btn.dataset.type;
+
+    if (btnType === "dir") {
+      btn.addEventListener("click", async () => await loadDir(btnPath));
+    }
+  }
 };
 
-rootEl.addEventListener("click", async () => {
-  const requestPath = "/";
-  document.title = requestPath;
-  const rootData = await fetchLS(requestPath);
-  populateFsMain(rootData);
-});
+const loadDir = async (requestPath) => {
+  if (document.title !== requestPath) document.title = requestPath;
+  const data = await fetchLS(requestPath);
+  if (data.error) {
+    console.error(data.error);
+    return;
+  }
+  await populateNav(requestPath);
+  await populateFsMain(data);
+};
+
+window.addEventListener("DOMContentLoaded", async () => await loadDir("/"));
