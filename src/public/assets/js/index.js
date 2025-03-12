@@ -16,20 +16,8 @@ const fetchLS = async (requestPath) => {
   }
 };
 
-const createRootEl = async () => {
-  const rootEl = document.createElement("li");
-  const button = document.createElement("button");
-  button.dataset.path = "/";
-  button.classList.add("nav-btn");
-  button.textContent = "/ (root)";
-
-  rootEl.appendChild(button);
-  navUlEl.appendChild(rootEl);
-};
-
 const populateNav = async (path) => {
-  navUlEl.innerHTML = "";
-  await createRootEl();
+  navUlEl.innerHTML = `<li><button class="nav-btn" data-path="/">/ (root)</button></li>`;
 
   const pathParts = path.split("/").filter((part) => part);
   let currentPath = "";
