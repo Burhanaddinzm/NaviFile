@@ -5,8 +5,9 @@ const navUlEl = document.querySelector("header nav ul");
 
 const fetchLS = async (requestPath) => {
   try {
+    const encodedPath = encodeURIComponent(requestPath);
     const response = await fetch(
-      `http://localhost:49154/ls?path=${requestPath}`
+      `http://localhost:49154/ls?path=${encodedPath}`
     );
     const data = await response.json();
 
