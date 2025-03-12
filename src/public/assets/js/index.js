@@ -90,6 +90,9 @@ const loadDir = async (requestPath) => {
   const data = await fetchLS(requestPath);
   if (data.error) {
     console.error(data.error);
+    if (data.error.includes("Permission denied"))
+      alert("Permission denied! Try running the server with sudo.");
+
     return;
   }
   await populateNav(requestPath);

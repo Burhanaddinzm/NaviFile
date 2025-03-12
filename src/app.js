@@ -122,7 +122,7 @@ app.use(express.json({ limit: "100mb" }));
 app.use(express.static(path.join(__dirname, "public")));
 
 app.get("/ls", async (req, res) => {
-  // making sure there is a default request path is set, if not get root dir
+  // making sure there is a default request path set, if not get root dir
   const requestedPath =
     req.query.path === "/" || req.query.path === ""
       ? "/"
