@@ -20,7 +20,7 @@ Navifile is a web-based file navigation tool built with Node.js and Express.js. 
 1. Clone the repository:
    ```sh
    git clone <repository-url>
-   cd navifile/src
+   cd NaviFile/src
    ```
 2. Install dependencies:
    ```sh
