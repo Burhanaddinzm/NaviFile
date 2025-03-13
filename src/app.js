@@ -53,9 +53,19 @@ const permissionsToIntStr = (permissionString) => {
   return result.toString();
 };
 
-const analyzeEntry = (entryLine, pathString) => {
-  const permissionString = entryLine[0];
+const checkIfDir = (linkTarget) => {
+  return new Promise((resolve) => {
+    exec(`stat -c %F ${linkTarget}`, (error, stdout) => {
+      if (error) {
+        return resolve(false); // Assume it's not a directory if stat fails
+      }
+      resolve(stdout.trim() === "directory");
+    });
+  });
+};
 
+const analyzeEntry = async (entryLine, pathString) => {
+  const permissionString = entryLine[0];
   const type =
     permissionString[0] === "l"
       ? "link"
@@ -69,8 +79,25 @@ const analyzeEntry = (entryLine, pathString) => {
 
   const size = entryLine[4];
   const permission = permissionsToIntStr(permissionString);
-  const name = entryLine.slice(8).join(" ");
-  // normalizing path to make sure it appears correctly
+  let name = entryLine.slice(8).join(" ");
+
+  let linkPath = null;
+  if (type === "link") {
+    const parts = name.split(" -\u003E ");
+    if (parts.length > 1) {
+      // name = parts[0];
+      let potentialLinkPath = parts[1];
+
+      // Resolve relative paths
+      if (!potentialLinkPath.startsWith("/")) {
+        potentialLinkPath = path.join(pathString, potentialLinkPath);
+      }
+
+      const isDir = await checkIfDir(potentialLinkPath);
+      linkPath = isDir ? potentialLinkPath : null;
+    }
+  }
+
   const fullPath =
     type === "link"
       ? `${pathString.endsWith("/") ? pathString : pathString + "/"}${
@@ -88,19 +115,24 @@ const analyzeEntry = (entryLine, pathString) => {
     permission,
     size,
     date: dateString,
+    linkPath,
   };
 };
 
-const splitEntries = (stdout, requestedPath) => {
-  return stdout
-    .split("\n") // 1. Split the output by newlines
-    .filter((line) => line) // 2. Remove any empty lines
-    .slice(1) // 3. Remove the first line (index 0)
-    .map((line) => {
-      // 4. Process each remaining line
-      const parts = line.split(/\s+/); // 5. Split the line by one or more spaces (whitespace)
+const splitEntries = async (stdout, requestedPath) => {
+  const lines = stdout
+    .split("\n")
+    .filter((line) => line)
+    .slice(1); // Skip first line
+
+  const entries = await Promise.all(
+    lines.map(async (line) => {
+      const parts = line.split(/\s+/); // Split by one or more spaces
       return analyzeEntry(parts, requestedPath);
-    });
+    })
+  );
+
+  return entries;
 };
 
 const run_ls = (requestedPath) => {

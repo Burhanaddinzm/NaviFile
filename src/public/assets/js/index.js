@@ -6,9 +6,7 @@ const navUlEl = document.querySelector("header nav ul");
 const fetchLS = async (requestPath) => {
   try {
     const encodedPath = encodeURIComponent(requestPath);
-    const response = await fetch(
-      `/ls?path=${encodedPath}`
-    );
+    const response = await fetch(`/ls?path=${encodedPath}`);
     const data = await response.json();
 
     return data;
@@ -40,7 +38,8 @@ const populateFsMain = async (data) => {
   let htmlContent = "";
 
   for (const entry of data) {
-    const { name, fullPath, path, permission, type, size, date } = entry;
+    const { name, fullPath, path, permission, type, size, date, linkPath } =
+      entry;
     const permArr = permission.split("");
     let addByte = false;
 
@@ -55,7 +54,9 @@ const populateFsMain = async (data) => {
                 ? "./assets/images/folder.svg"
                 : "./assets/images/file.svg"
             }" alt="">
-            <button id="content-btn" data-path="${path}" data-full-path="${fullPath}" data-type="${type}">${name}</button>
+            <button id="content-btn" data-link-path="${
+              type === "link" && linkPath !== null ? linkPath : ""
+            }" data-path="${path}" data-full-path="${fullPath}" data-type="${type}">${name}</button>
           </div>
           <span>${size}${addByte ? "B" : ""}</span>
           <div>U:${permArr[0]} G:${permArr[1]} O:${permArr[2]}</div>
@@ -81,6 +82,10 @@ const populateFsMain = async (data) => {
 
     if (btnType === "dir") {
       btn.addEventListener("click", async () => await loadDir(btnPath));
+    } else if (btnType === "link") {
+      const linkPath = btn.dataset.linkPath;
+      if (linkPath)
+        btn.addEventListener("click", async () => await loadDir(linkPath));
     }
   }
 };
