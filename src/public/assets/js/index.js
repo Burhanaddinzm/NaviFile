@@ -4,7 +4,7 @@ const fsMainEl = document.querySelector(".fs-main");
 const navUlEl = document.querySelector("header nav ul");
 const fileViewerModal = document.getElementById("filev-mod");
 
-fileViewerModal.addEventListener("click", (e) => {
+fileViewerModal.addEventListener("mousedown", (e) => {
   if (e.target === fileViewerModal) {
     fileViewerModal.classList.add("hidden");
     document.body.style.overflow = "visible";
