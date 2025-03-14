@@ -4,6 +4,13 @@ const fsMainEl = document.querySelector(".fs-main");
 const navUlEl = document.querySelector("header nav ul");
 const fileViewerModal = document.getElementById("filev-mod");
 
+fileViewerModal.addEventListener("click", (e) => {
+  if (e.target === fileViewerModal) {
+    fileViewerModal.classList.add("hidden");
+    document.body.style.overflow = "visible";
+  }
+});
+
 const fetchLS = async (requestPath) => {
   try {
     const encodedPath = encodeURIComponent(requestPath);
@@ -28,7 +35,22 @@ const fetchCat = async (requestPath) => {
   }
 };
 
-const openFileViewer = () => {};
+const populateFileViewer = (data, name) => {
+  const textEl = fileViewerModal.querySelector(".text");
+  const nameEl = fileViewerModal.querySelector(".name");
+  const lineNumbersEl = fileViewerModal.querySelector(".line-numbers");
+
+  nameEl.textContent = `> ${name}`;
+  textEl.textContent = data;
+
+  lineNumbersEl.innerHTML = "";
+  const lines = data.split("\n");
+  lines.forEach((line, index) => {
+    const span = document.createElement("span");
+    span.textContent = index + 1;
+    lineNumbersEl.appendChild(span);
+  });
+};
 
 const populateNav = async (path) => {
   navUlEl.innerHTML = `<li><button class="nav-btn" data-path="/">/ (root)</button></li>`;
@@ -95,21 +117,30 @@ const populateFsMain = async (data) => {
     const btnPath = btn.dataset.fullPath;
     const btnType = btn.dataset.type;
     const linkPath = btn.dataset.linkPath;
+    const name = btn.textContent;
 
     switch (btnType) {
       case "dir":
         btn.addEventListener("click", async () => await loadDir(btnPath));
         break;
       case "link-dir":
-        if (linkPath)
+        if (linkPath) {
           btn.addEventListener("click", async () => await loadDir(linkPath));
+        }
         break;
       case "link-file":
-        if (linkPath)
-          btn.addEventListener("click", async () => await loadFile(linkPath));
+        if (linkPath) {
+          btn.addEventListener(
+            "click",
+            async () => await loadFile(linkPath, name)
+          );
+        }
         break;
       case "file":
-        btn.addEventListener("click", async () => await loadFile(btnPath));
+        btn.addEventListener(
+          "click",
+          async () => await loadFile(btnPath, name)
+        );
         break;
     }
   }
@@ -129,7 +160,7 @@ const loadDir = async (requestPath) => {
   await populateFsMain(data);
 };
 
-const loadFile = async (requestPath) => {
+const loadFile = async (requestPath, name) => {
   const data = await fetchCat(requestPath);
   if (data.error) {
     console.error(data.error);
@@ -138,7 +169,9 @@ const loadFile = async (requestPath) => {
 
     return;
   }
-  console.log(data);
+  populateFileViewer(data, name);
+  fileViewerModal.classList.remove("hidden");
+  document.body.style.overflow = "hidden";
 };
 
 window.addEventListener("DOMContentLoaded", async () => await loadDir("/"));

@@ -178,7 +178,7 @@ main {
 }
 
 .modal {
-  position: absolute;
+  position: fixed;
   top: 0;
   left: 0;
   z-index: 1000;
@@ -189,9 +189,8 @@ main {
 
 .file-viewer {
   width: 75vw;
-  height: 800px;
+  height: 700px;
   margin: 50px auto 0;
-  overflow: hidden;
 }
 
 .file-viewer .name {
@@ -200,6 +199,9 @@ main {
   width: 100%;
   border-radius: 4px 4px 0 0;
   border-bottom: 1px solid #000;
+  position: sticky;
+  top: 0;
+  left: 0;
 }
 
 .file-viewer .text-area {
@@ -221,6 +223,8 @@ main {
 .file-viewer .text {
   padding: 0 8px;
   background: #ccc;
+  white-space: pre;
+  padding-bottom: 20px;
 }
 
 @media screen and (max-width: 1280px) {
@@ -350,6 +354,10 @@ main {
   .fs-main li .actions-container button {
     padding: 4px;
   }
+
+  .file-viewer {
+    height: 450px;
+  }
 }
 
 @media screen and (max-width: 426px) {
@@ -374,5 +382,9 @@ main {
   .fs-id img {
     width: 12px;
     height: 12px;
+  }
+
+  .file-viewer .name {
+    font-size: 18px;
   }
 }
