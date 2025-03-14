@@ -2,6 +2,7 @@
 
 const fsMainEl = document.querySelector(".fs-main");
 const navUlEl = document.querySelector("header nav ul");
+const fileViewerModal = document.getElementById("filev-mod");
 
 const fetchLS = async (requestPath) => {
   try {
@@ -14,6 +15,20 @@ const fetchLS = async (requestPath) => {
     console.error(error);
   }
 };
+
+const fetchCat = async (requestPath) => {
+  try {
+    const encodedPath = encodeURIComponent(requestPath);
+    const response = await fetch(`/cat?path=${encodedPath}`);
+    const data = await response.json();
+
+    return data;
+  } catch (error) {
+    console.error(error);
+  }
+};
+
+const openFileViewer = () => {};
 
 const populateNav = async (path) => {
   navUlEl.innerHTML = `<li><button class="nav-btn" data-path="/">/ (root)</button></li>`;
@@ -48,14 +63,14 @@ const populateFsMain = async (data) => {
     htmlContent += `<li>
           <div class="fs-id">
             <img src="${
-              type === "link"
+              type.includes("link")
                 ? "./assets/images/link.svg"
                 : type === "dir"
                 ? "./assets/images/folder.svg"
                 : "./assets/images/file.svg"
             }" alt="">
             <button id="content-btn" data-link-path="${
-              type === "link" && linkPath !== null ? linkPath : ""
+              type.includes("link") && linkPath !== null ? linkPath : ""
             }" data-path="${path}" data-full-path="${fullPath}" data-type="${type}">${name}</button>
           </div>
           <span>${size}${addByte ? "B" : ""}</span>
@@ -79,13 +94,23 @@ const populateFsMain = async (data) => {
   for (const btn of btns) {
     const btnPath = btn.dataset.fullPath;
     const btnType = btn.dataset.type;
+    const linkPath = btn.dataset.linkPath;
 
-    if (btnType === "dir") {
-      btn.addEventListener("click", async () => await loadDir(btnPath));
-    } else if (btnType === "link") {
-      const linkPath = btn.dataset.linkPath;
-      if (linkPath)
-        btn.addEventListener("click", async () => await loadDir(linkPath));
+    switch (btnType) {
+      case "dir":
+        btn.addEventListener("click", async () => await loadDir(btnPath));
+        break;
+      case "link-dir":
+        if (linkPath)
+          btn.addEventListener("click", async () => await loadDir(linkPath));
+        break;
+      case "link-file":
+        if (linkPath)
+          btn.addEventListener("click", async () => await loadFile(linkPath));
+        break;
+      case "file":
+        btn.addEventListener("click", async () => await loadFile(btnPath));
+        break;
     }
   }
 };
@@ -102,6 +127,18 @@ const loadDir = async (requestPath) => {
   }
   await populateNav(requestPath);
   await populateFsMain(data);
+};
+
+const loadFile = async (requestPath) => {
+  const data = await fetchCat(requestPath);
+  if (data.error) {
+    console.error(data.error);
+    if (data.error.includes("Permission denied"))
+      alert("Permission denied! Try running the server with sudo.");
+
+    return;
+  }
+  console.log(data);
 };
 
 window.addEventListener("DOMContentLoaded", async () => await loadDir("/"));

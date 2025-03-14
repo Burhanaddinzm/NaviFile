@@ -1,6 +1,6 @@
 const express = require("express");
 const path = require("path");
-const { exec } = require("child_process");
+const { exec, spawn } = require("child_process");
 
 const app = express();
 const port = 49154;
@@ -55,7 +55,7 @@ const permissionsToIntStr = (permissionString) => {
 
 const checkIfDir = (linkTarget) => {
   return new Promise((resolve) => {
-    exec(`stat -c %F ${linkTarget}`, (error, stdout) => {
+    exec(`stat -c %F "${linkTarget}"`, (error, stdout) => {
       if (error) {
         return resolve(false); // Assume it's not a directory if stat fails
       }
@@ -66,7 +66,7 @@ const checkIfDir = (linkTarget) => {
 
 const analyzeEntry = async (entryLine, pathString) => {
   const permissionString = entryLine[0];
-  const type =
+  let type =
     permissionString[0] === "l"
       ? "link"
       : permissionString[0] === "d"
@@ -93,13 +93,17 @@ const analyzeEntry = async (entryLine, pathString) => {
         potentialLinkPath = path.join(pathString, potentialLinkPath);
       }
 
-      const isDir = await checkIfDir(potentialLinkPath);
-      linkPath = isDir ? potentialLinkPath : null;
+      linkPath = potentialLinkPath;
+      if (await checkIfDir(potentialLinkPath)) {
+        type = "link-dir";
+      } else {
+        type = "link-file";
+      }
     }
   }
 
   const fullPath =
-    type === "link"
+    type === "link-file" || type === "link-dir"
       ? `${pathString.endsWith("/") ? pathString : pathString + "/"}${
           name.split(" -\u003E ")[0]
         }`
@@ -137,7 +141,7 @@ const splitEntries = async (stdout, requestedPath) => {
 
 const run_ls = (requestedPath) => {
   return new Promise((resolve, reject) => {
-    exec(`ls -lh ${requestedPath}`, (error, stdout, stderr) => {
+    exec(`ls -lh "${requestedPath}"`, (error, stdout, stderr) => {
       if (error) {
         return reject(new Error(error.message));
       }
@@ -146,6 +150,29 @@ const run_ls = (requestedPath) => {
       }
       const entries = splitEntries(stdout, requestedPath);
       resolve(entries);
+    });
+  });
+};
+
+const run_cat = (requestPath) => {
+  return new Promise((resolve, reject) => {
+    const cat = spawn("cat", [requestPath]);
+    let data = "";
+
+    cat.stdout.on("data", (chunk) => {
+      data += chunk.toString();
+    });
+
+    cat.stderr.on("data", (error) => {
+      reject(new Error(error.toString()));
+    });
+
+    cat.on("close", (code) => {
+      if (code === 0) {
+        resolve(data);
+      } else {
+        reject(new Error(`Process exited with code ${code}`));
+      }
     });
   });
 };
@@ -162,6 +189,19 @@ app.get("/ls", async (req, res) => {
 
   try {
     const result = await run_ls(requestedPath);
+    res.status(200).json(result);
+  } catch (error) {
+    res.status(500).json({ error: `Error: ${error.message}` });
+  }
+});
+
+app.get("/cat", async (req, res) => {
+  if (req.query.path === "") return;
+  const requestedPath = req.query.path;
+
+  try {
+    const result = await run_cat(requestedPath);
+
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({ error: `Error: ${error.message}` });
