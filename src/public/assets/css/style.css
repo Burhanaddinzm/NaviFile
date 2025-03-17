@@ -218,6 +218,9 @@ main {
   border-right: 1px solid #000;
   padding: 0 4px;
   background-color: #fff;
+  position: sticky;
+  top: 0;
+  left: 0;
 }
 
 .file-viewer .text {
