@@ -221,6 +221,7 @@ main {
   position: sticky;
   top: 0;
   left: 0;
+  line-height: 25px;
 }
 
 .file-viewer .text {
@@ -228,6 +229,7 @@ main {
   background: #ccc;
   white-space: pre;
   padding-bottom: 20px;
+  line-height: 25px;
 }
 
 @media screen and (max-width: 1280px) {

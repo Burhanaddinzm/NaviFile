@@ -28,7 +28,6 @@ const convertToDateTime = (str) => {
   return { dateString, dateJsFormat };
 };
 
-// Function to convert permission string to an integer
 const permissionsToIntStr = (permissionString) => {
   let result = 0;
 
@@ -47,7 +46,6 @@ const permissionsToIntStr = (permissionString) => {
         chunkValue += permissionValues[chunk[j]];
       }
     }
-    // Add the chunk value to the result
     result = result * 10 + chunkValue;
   }
   return result.toString();
