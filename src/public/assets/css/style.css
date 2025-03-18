@@ -232,6 +232,51 @@ main {
   line-height: 25px;
 }
 
+.mv-cp {
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.mv-cp * {
+  font-size: 16px;
+}
+
+.mv-cp .path {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  align-items: center;
+}
+
+.mv-cp .path input {
+  padding: 4px 20px;
+}
+
+.mv-cp .path-container {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mv-cp button {
+  padding: 10px;
+  background-color: rgb(112, 71, 153);
+  border-radius: 4px;
+  color: #fff;
+  transition: color 100ms linear, scale 100ms linear;
+  font-weight: 700;
+}
+
+.mv-cp button:hover {
+  color: rgb(245, 173, 255);
+}
+
+.mv-cp button:active {
+  scale: 0.98;
+}
+
 @media screen and (max-width: 1280px) {
   nav {
     padding: 12px 0;

@@ -175,9 +175,7 @@ const loadFile = async (requestPath, name) => {
   document.body.style.overflow = "hidden";
 
   const textAreaEl = fileViewerModal.querySelector(".text-area");
-  if (textAreaEl) {
-    textAreaEl.scrollTo({ top: 0, behavior: "instant" });
-  }
+  textAreaEl.scrollTo({ top: 0, left: 0, behavior: "instant" });
 };
 
 window.addEventListener("DOMContentLoaded", async () => await loadDir("/"));
