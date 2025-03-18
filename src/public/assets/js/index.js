@@ -170,8 +170,14 @@ const loadFile = async (requestPath, name) => {
     return;
   }
   populateFileViewer(data, name);
+
   fileViewerModal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
+
+  const textAreaEl = fileViewerModal.querySelector(".text-area");
+  if (textAreaEl) {
+    textAreaEl.scrollTo({ top: 0, behavior: "instant" });
+  }
 };
 
 window.addEventListener("DOMContentLoaded", async () => await loadDir("/"));
