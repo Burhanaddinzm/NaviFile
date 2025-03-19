@@ -96,6 +96,7 @@ nav ul {
 
 main {
   padding: 40px 0 80px;
+  position: relative;
 }
 
 .fs-header {
@@ -113,7 +114,7 @@ main {
 
 .fs-main li {
   display: grid;
-  grid-template-columns: 2.5fr 0.8fr repeat(2, 1fr) 120px;
+  grid-template-columns: 2.5fr 0.8fr repeat(2, 1fr) 140px;
   justify-content: start;
   padding: 8px 8px 4px;
   align-items: center;
@@ -237,6 +238,11 @@ main {
   display: flex;
   gap: 10px;
   margin-bottom: 20px;
+  position: sticky;
+  z-index: 100;
+  top: 70px;
+  padding: 20px;
+  background-color: #fff;
 }
 
 .mv-cp * {
@@ -311,6 +317,10 @@ main {
     height: 28px;
   }
 
+  .mv-cp {
+    top: 58px;
+  }
+
   .mv-cp * {
     font-size: 14px;
   }
@@ -352,6 +362,11 @@ main {
     height: 24px;
   }
 
+  .mv-cp {
+    top: 44px;
+    padding: 10px;
+  }
+
   .mv-cp * {
     font-size: 12px;
   }
@@ -379,6 +394,9 @@ main {
     flex-direction: column;
     align-items: center;
     margin-bottom: 10px;
+    top: 37px;
+    padding: 6px;
+    gap: 5px;
   }
 
   .mv-cp * {
@@ -473,6 +491,11 @@ main {
 }
 
 @media screen and (max-width: 426px) {
+  .mv-cp {
+    top: 25px;
+    padding: 6px;
+  }
+
   .mv-cp .path {
     grid-template-columns: 25px 1fr;
   }

@@ -100,7 +100,7 @@ const populateFsMain = async (data) => {
           <div>U:${permArr[0]} G:${permArr[1]} O:${permArr[2]}</div>
           <span>${date}</span>
           <div class="actions-container">
-            <select name="actions" id="">
+            <select name="actions">
               <option value="move">Move</option>
               <option value="copy">Copy</option>
               <option value="delete">Delete</option>
