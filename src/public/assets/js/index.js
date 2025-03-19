@@ -45,6 +45,7 @@ const populateFileViewer = (data, name) => {
 
   lineNumbersEl.innerHTML = "";
   const lines = data.split("\n");
+
   lines.forEach((line, index) => {
     const span = document.createElement("span");
     span.textContent = index + 1;
@@ -158,6 +159,7 @@ const loadDir = async (requestPath) => {
   }
   await populateNav(requestPath);
   await populateFsMain(data);
+  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
 };
 
 const loadFile = async (requestPath, name) => {
@@ -174,8 +176,9 @@ const loadFile = async (requestPath, name) => {
   fileViewerModal.classList.remove("hidden");
   document.body.style.overflow = "hidden";
 
-  const textAreaEl = fileViewerModal.querySelector(".text-area");
-  textAreaEl.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  fileViewerModal
+    .querySelector(".text-area")
+    .scrollTo({ top: 0, left: 0, behavior: "instant" });
 };
 
 window.addEventListener("DOMContentLoaded", async () => await loadDir("/"));
