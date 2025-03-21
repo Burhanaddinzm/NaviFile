@@ -1,7 +1,9 @@
 "use strict";
 
 const fsMainEl = document.querySelector(".fs-main");
+const navEl = document.querySelector("nav");
 const navUlEl = document.querySelector("header nav ul");
+const mvCpEl = document.querySelector(".mv-cp");
 const fileViewerModal = document.getElementById("filev-mod");
 
 fileViewerModal.addEventListener("mousedown", (e) => {
@@ -53,6 +55,12 @@ const populateFileViewer = (data, name) => {
   });
 };
 
+// changes mv-cp's height from top to equal to nav height so it is visible at all times and change distance from top dynamically as a workaround for bad css code :/
+const change_distance_top_mv_cp = (navHeight) => {
+  if (navHeight !== parseInt(mvCpEl.style.top.replace("px", "")))
+    mvCpEl.style.top = `${navHeight}px`;
+};
+
 const populateNav = async (path) => {
   navUlEl.innerHTML = `<li><button class="nav-btn" data-path="/">/ (root)</button></li>`;
 
@@ -69,6 +77,8 @@ const populateNav = async (path) => {
     const path = button.dataset.path;
     button.addEventListener("click", async () => await loadDir(path));
   }
+
+  change_distance_top_mv_cp(navEl.getClientRects()[0].height);
 };
 
 const populateFsMain = async (data) => {
