@@ -191,4 +191,7 @@ const loadFile = async (requestPath, name) => {
     .scrollTo({ top: 0, left: 0, behavior: "instant" });
 };
 
+window.addEventListener("resize", () => {
+  change_distance_top_mv_cp(navEl.getClientRects()[0].height);
+});
 window.addEventListener("DOMContentLoaded", async () => await loadDir("/"));
