@@ -101,7 +101,7 @@ main {
 
 .fs-header {
   display: grid;
-  grid-template-columns: 2.5fr 0.8fr repeat(2, 1fr) 120px;
+  grid-template-columns: 2.5fr 0.8fr repeat(2, 1fr) 140px;
   justify-content: start;
   padding: 8px;
   margin: 0 0 0 -24px;

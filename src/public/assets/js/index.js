@@ -4,7 +4,13 @@ const fsMainEl = document.querySelector(".fs-main");
 const navEl = document.querySelector("nav");
 const navUlEl = document.querySelector("header nav ul");
 const mvCpEl = document.querySelector(".mv-cp");
+const mvCpSubmit = mvCpEl.querySelector("#mv-cp-submit");
+const mvCpCancel = mvCpEl.querySelector("#mv-cp-cancel");
 const fileViewerModal = document.getElementById("filev-mod");
+
+mvCpCancel.addEventListener("click", () => {
+  mvCpEl.classList.add("hidden");
+});
 
 fileViewerModal.addEventListener("mousedown", (e) => {
   if (e.target === fileViewerModal) {
@@ -117,7 +123,7 @@ const populateFsMain = async (data) => {
               <option value="rename">Rename</option>
               <option value="chmod">Chmod</option>
             </select>
-            <button>Act</button>
+            <button data-full-path=${fullPath}>Act</button>
           </div>
         </li>`;
   }
@@ -154,6 +160,14 @@ const populateFsMain = async (data) => {
         );
         break;
     }
+  }
+
+  const actionsContainers = document.querySelectorAll(".actions-container");
+  for (const actionsContainer of actionsContainers) {
+    const actBtn = actionsContainer.querySelector("button");
+    actBtn.addEventListener("click", () => {
+      mvCpEl.classList.remove("hidden");
+    });
   }
 };
 
