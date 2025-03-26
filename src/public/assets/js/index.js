@@ -6,6 +6,8 @@ const navUlEl = document.querySelector("header nav ul");
 const mvCpEl = document.querySelector(".mv-cp");
 const mvCpSubmit = mvCpEl.querySelector("#mv-cp-submit");
 const mvCpCancel = mvCpEl.querySelector("#mv-cp-cancel");
+const mvCpFromPath = mvCpEl.querySelector("#from-path");
+const mvCpToPath = mvCpEl.querySelector("#to-path");
 const fileViewerModal = document.getElementById("filev-mod");
 
 mvCpCancel.addEventListener("click", () => {
@@ -123,7 +125,7 @@ const populateFsMain = async (data) => {
               <option value="rename">Rename</option>
               <option value="chmod">Chmod</option>
             </select>
-            <button data-full-path=${fullPath}>Act</button>
+            <button data-full-path=${path}>Act</button>
           </div>
         </li>`;
   }
@@ -165,14 +167,21 @@ const populateFsMain = async (data) => {
   const actionsContainers = document.querySelectorAll(".actions-container");
   for (const actionsContainer of actionsContainers) {
     const actBtn = actionsContainer.querySelector("button");
+    const actionSelect = actionsContainer.querySelector("select");
     actBtn.addEventListener("click", () => {
-      mvCpEl.classList.remove("hidden");
+      const isSelectMvCp =
+        actionSelect.value === "move" || actionSelect.value === "copy";
+      if (isSelectMvCp) {
+        mvCpFromPath.value = actBtn.dataset.fullPath;
+        mvCpEl.classList.remove("hidden");
+      }
     });
   }
 };
 
 const loadDir = async (requestPath) => {
   if (document.title !== requestPath) document.title = requestPath;
+  mvCpToPath.value = requestPath;
   const data = await fetchLS(requestPath);
   if (data.error) {
     console.error(data.error);
