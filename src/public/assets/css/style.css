@@ -129,6 +129,8 @@ main {
   text-align: start;
   transition: color 100ms linear;
   font-weight: 700;
+  word-wrap: break-word;
+  max-width: 430px;
 }
 
 .fs-main li button:hover {
@@ -311,6 +313,10 @@ main {
     font-size: 16px;
   }
 
+  .fs-main li button {
+    max-width: 310px;
+  }
+
   .fs-id img {
     width: 28px;
     height: 28px;
@@ -354,6 +360,10 @@ main {
 
   .fs-main li * {
     font-size: 10px;
+  }
+
+  .fs-main li button {
+    max-width: 190px;
   }
 
   .fs-id img {
@@ -462,6 +472,10 @@ main {
     text-align: center;
   }
 
+  .fs-main li button {
+    max-width: 120px;
+  }
+
   .fs-id img {
     width: 16px;
     height: 16px;
@@ -530,7 +544,26 @@ main {
     height: 12px;
   }
 
+  .fs-main li button {
+    max-width: 85px;
+  }
+
+  .file-viewer {
+    width: 90vw;
+    height: 80vh;
+  }
+
   .file-viewer .name {
     font-size: 18px;
+  }
+
+  .file-viewer .line-numbers {
+    font-size: 12px;
+    line-height: 18px;
+  }
+
+  .file-viewer .text {
+    font-size: 12px;
+    line-height: 18px;
   }
 }
