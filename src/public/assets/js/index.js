@@ -96,6 +96,7 @@ const populateFsMain = async (data) => {
   for (const entry of data) {
     const { name, fullPath, path, permission, type, size, date, linkPath } =
       entry;
+
     const permArr = permission.split("");
     let addByte = false;
 
@@ -180,16 +181,19 @@ const populateFsMain = async (data) => {
 };
 
 const loadDir = async (requestPath) => {
-  if (document.title !== requestPath) document.title = requestPath;
-  mvCpToPath.value = requestPath;
   const data = await fetchLS(requestPath);
   if (data.error) {
     console.error(data.error);
     if (data.error.includes("Permission denied"))
       alert("Permission denied! Try running the server with sudo.");
+    if (data.error.includes("No such file or directory"))
+      alert("File or directory not found!");
 
     return;
   }
+  if (document.title !== requestPath) document.title = requestPath;
+  mvCpToPath.value = requestPath;
+
   await populateNav(requestPath);
   await populateFsMain(data);
   window.scrollTo({ top: 0, left: 0, behavior: "instant" });
@@ -201,6 +205,8 @@ const loadFile = async (requestPath, name) => {
     console.error(data.error);
     if (data.error.includes("Permission denied"))
       alert("Permission denied! Try running the server with sudo.");
+    if (data.error.includes("No such file or directory"))
+      alert("File or directory not found!");
 
     return;
   }

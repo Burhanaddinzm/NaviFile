@@ -129,12 +129,28 @@ const splitEntries = async (stdout, requestedPath) => {
 
   const entries = await Promise.all(
     lines.map(async (line) => {
-      const parts = line.split(/\s+/); // Split by one or more spaces
-      return analyzeEntry(parts, requestedPath);
+      const parts = line.match(
+        /^(\S+)\s+(\d+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(.*)$/
+      );
+      if (!parts) return null;
+
+      const entryData = [
+        parts[1], // Permissions
+        parts[2], // Links
+        parts[3], // Owner
+        parts[4], // Group
+        parts[5], // Size
+        parts[6], // Month
+        parts[7], // Day
+        parts[8], // Time/Year
+        parts[9], // File name (preserves spaces)
+      ];
+
+      return analyzeEntry(entryData, requestedPath);
     })
   );
 
-  return entries;
+  return entries.filter(Boolean); // purge false values (null,undefined,etc)
 };
 
 const run_ls = (requestedPath) => {
